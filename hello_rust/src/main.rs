@@ -2,29 +2,73 @@ use std::io::stdin;
 use serde_json;
 use serde::{Deserialize,Serialize};
 
+
+#[derive(Debug,Serialize,Deserialize)]
+struct TypeNameStatusPokemon {
+    name: String
+}
+
+#[derive(Debug,Serialize,Deserialize)]
+struct TypeStatusPokemon {
+    r#type: TypeNameStatusPokemon
+}
+
+#[derive(Debug,Serialize,Deserialize)]
+struct NameStatusPokemon {
+    name: String
+}
+
+#[derive(Debug,Serialize,Deserialize)]
+struct StatusPokemon {
+    base_stat: i32,
+    stat: NameStatusPokemon
+}
+
+
 #[derive(Debug,Serialize,Deserialize)]
 // #[serde(rename_all = "camelCase")]
 struct JsonPara {
     // #[serde(rename = "camelCase")]
     // abilities: Vec<String>,
-    base_experience: i32,
+    pub base_experience: i32,
     // forms: Vec<String>,
     // game_indices: Vec<String>,
-    height: i32,
+    pub height: i32,
     // held_items: Vec<String>,
-    id: i32,
-    is_default: bool,
-    location_area_encounters: String,
+    pub id: i32,
+    pub is_default: bool,
+    pub location_area_encounters: String,
     // moves: Vec<String>,
-    name: String,
-    order: i32,
+    pub name: String,
+    pub order: i32,
     // past_abilities: Vec<String>,
     // past_types: Vec<String>,
-    // species: Vec<String>,
+    // species: SpeciesPokemon,
     // sprites: Vec<String>,
-    // stats: Vec<String>,
-    // types: Vec<String>,
-    weight:i32,
+    pub stats: Vec<StatusPokemon>,
+    pub types: Vec<TypeStatusPokemon>,
+    pub weight:i32,
+}
+
+fn getpoketypes(body: JsonPara)->JsonPara{
+    for i in 0..body.types.len(){
+        let mut type_poke = &body.types[i].r#type.name;
+        if i < body.types.len(){
+            type_poke = type_poke ;
+        }
+        println!("{}",type_poke);
+    }
+    body
+}
+fn getpokeinfo(poke_number: i32){
+    let url = format!("https://pokeapi.co/api/v2/pokemon/{}",poke_number);
+    let body:JsonPara = reqwest::blocking::get(url).unwrap().json().unwrap();
+    // let typepokedata:JsonPara = body.clone();
+    // getpoketypes(typepokedata);
+    
+    
+    println!("#{} {}                      ",poke_number, body.name.to_uppercase());
+
 }
 fn main() -> Result<(),reqwest::Error>{
     let mut poke_number = String::new();
@@ -39,11 +83,12 @@ fn main() -> Result<(),reqwest::Error>{
         Ok(poke_number) => poke_number,
         Err(_err) => 0i32
     };
-    
-    let url = format!("https://pokeapi.co/api/v2/pokemon/{}",poke_number);
-    let body:JsonPara = reqwest::blocking::get(url).unwrap().json().unwrap();    
-    // let body:JsonPara  = serde::de::Deserialize::deserialize(body).unwrap();
-    println!("{:#?}",body);
+    if poke_number < 1292{
+        getpokeinfo(poke_number);
+        // let body:JsonPara  = serde::de::Deserialize::deserialize(body).unwrap();
+        // println!("{:#?}",body.stats[0].stat.name);
+    }else {
+        println!("Incorrect PokeNumber")
+    }
     Ok(())
-
 }
