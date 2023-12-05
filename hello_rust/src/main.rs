@@ -2,6 +2,20 @@ use std::io::stdin;
 use serde_json;
 use serde::{Deserialize,Serialize};
 
+// #[derive(Debug,Serialize,Deserialize)]
+// struct AbilitiesNameStatusPokemon {
+//     name: String
+// }
+
+#[derive(Debug,Serialize,Deserialize)]
+struct IndexAbilitiesStatusPokemon {
+    name: String
+}
+
+#[derive(Debug,Serialize,Deserialize)]
+struct AbilitiesStatusPokemon {
+    ability: IndexAbilitiesStatusPokemon,
+}
 
 #[derive(Debug,Serialize,Deserialize)]
 struct TypeNameStatusPokemon {
@@ -21,7 +35,8 @@ struct NameStatusPokemon {
 #[derive(Debug,Serialize,Deserialize)]
 struct StatusPokemon {
     base_stat: i32,
-    stat: NameStatusPokemon
+    stat: NameStatusPokemon,
+    effort: i32
 }
 
 
@@ -29,7 +44,7 @@ struct StatusPokemon {
 // #[serde(rename_all = "camelCase")]
 struct JsonPara {
     // #[serde(rename = "camelCase")]
-    // abilities: Vec<String>,
+    abilities: Vec<AbilitiesStatusPokemon>,
     pub base_experience: i32,
     // forms: Vec<String>,
     // game_indices: Vec<String>,
@@ -67,9 +82,33 @@ fn getpokeinfo(poke_number: i32){
     // getpoketypes(typepokedata);
     
     
-    println!("#{} {}                      ",poke_number, body.name.to_uppercase());
-
+    print!("#{} - {}                                ",poke_number, body.name.to_uppercase());
+    // println!("{:?}",body.abilities[0].ability.name);
+    // println!("=====================================================================");
+    print!("Types: ");
+    for i in 0..body.types.len(){
+        print!("{}", body.types[i].r#type.name);
+        if i < body.types.len()-1{
+            print!(" | ")
+        }
+    }
+    println!();
+    println!("=====================================================================");
+    print!("Weight: {} Kg | Height : {} m                ", body.weight,body.height);
+    print!("Abilities: ");
+    for i in 0..body.types.len(){
+        print!("{}", body.abilities[i].ability.name);
+        if i < body.types.len()-1{
+            print!(" | ")
+        }
+    }
+    println!("\n");
+    println!("{} : {} ({})                                   {} : {} ({})",body.stats[0].stat.name.to_uppercase(),body.stats[0].base_stat,body.stats[0].effort,body.stats[5].stat.name.to_uppercase(),body.stats[5].base_stat,body.stats[5].effort);
+    println!("{} : {} ({})                               {} : {} ({})",body.stats[1].stat.name.to_uppercase(),body.stats[1].base_stat,body.stats[1].effort,body.stats[3].stat.name.to_uppercase(),body.stats[3].base_stat,body.stats[3].effort);
+    println!("{} : {} ({})                              {} : {} ({})",body.stats[2].stat.name.to_uppercase(),body.stats[2].base_stat,body.stats[2].effort,body.stats[4].stat.name.to_uppercase(),body.stats[4].base_stat,body.stats[4].effort);
 }
+
+
 fn main() -> Result<(),reqwest::Error>{
     let mut poke_number = String::new();
     println!("Enter a number between 1 and 1292");
